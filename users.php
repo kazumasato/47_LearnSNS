@@ -13,7 +13,7 @@
                             <img src="user_profile_img/misae.png" width="80px">
                         </div>
                         <div class="col-xs-10">
-                            名前 <a href="profile.php" style="color: #7f7f7f;">野原みさえ</a>
+                            名前 <a href="profile.php" style="color: #7f7f7f;">あ</a>
                             <br>
                             2018-10-14 12:34:56からメンバー
                         </div>
