@@ -41,7 +41,7 @@ if (!empty($_POST)) {
 //1.投稿情報を全て取得
 $sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
 FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
-ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
+ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC';
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 
@@ -97,7 +97,7 @@ while (true) {
                 <div class="thumbnail">
                     <div class="row">
                         <div class="col-xs-1">
-                            <img src="user_profile_img/<?php echo $feed['img_name']; ?>" width="40px">
+                            <img src="user_profile_img/<?php echo $feed['img_name']; ?>" width="100%px">
                         </div>
                         <div class="col-xs-11">
                             <a href="profile.php" style="color: #7f7f7f;"><?php echo $feed['name']; ?></a>
@@ -117,7 +117,7 @@ while (true) {
                             <a href="#collapseComment" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
                             <span class="comment-count">コメント数：5</span>
                             <?php if ($signin_user['id']==$feed['user_id']): ?>
-                            <a href="edit.php" class="btn btn-success btn-xs">編集</a>
+                            <a href="edit.php?feed_id=<?php echo$feed['id']; ?>" class="btn btn-success btn-xs">編集</a>
                             <a onclick="return confirm('ほんとに消すの？');" href="delete.php?feed_id=<?php echo $feed['id']; ?>" class="btn btn-danger btn-xs">削除</a>
                         <?php endif; ?>
                         </div>
