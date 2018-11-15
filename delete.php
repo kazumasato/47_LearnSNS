@@ -14,3 +14,7 @@ $stmt->execute($data);
 //3.timeline.phpに遷移
 header("Location: timeline.php");
 exit();
+
+//auto increment primarykey(主キー=一意のもの)
+//$sql='DELETE FROM `feeds` WHERE `id`=?';
+//どのテーブルの(feeds)どこのレコードを(WHERE)

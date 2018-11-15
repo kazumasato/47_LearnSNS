@@ -29,6 +29,7 @@ if (!empty($_POST)) {
   if ($email == '') {
     $errors['email'] = 'blank';
   }
+
   //strlen(文字列)
   //文字列の文字数を返す
   $count = strlen($password);
@@ -148,7 +149,7 @@ if (!empty($_POST)) {
                             <?php if (isset($errors['password'])&& $errors['password'] == 'length'):?>
                                 <p class="text-danger">パスワードは4~16文字で入力してください</p>
                             <?php endif; ?>
-                            <?php if (!isset($errors['password'])&& 'blank'): ?>
+                            <?php if (!empty($errors)): ?>
                               <p class="text-danger">パスワードを再入力してください</p>
                               <?php endif; ?>
                     </div>

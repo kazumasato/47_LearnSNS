@@ -118,6 +118,7 @@ while (true) {
                             <span class="comment-count">コメント数：5</span>
                             <?php if ($signin_user['id']==$feed['user_id']): ?>
                             <a href="edit.php?feed_id=<?php echo$feed['id']; ?>" class="btn btn-success btn-xs">編集</a>
+                            <!-- url? キー = 値 (url 宛先)-->
                             <a onclick="return confirm('ほんとに消すの？');" href="delete.php?feed_id=<?php echo $feed['id']; ?>" class="btn btn-danger btn-xs">削除</a>
                         <?php endif; ?>
                         </div>
