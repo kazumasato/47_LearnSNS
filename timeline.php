@@ -1,6 +1,8 @@
 <?php
 session_start();
 require('dbconnect.php');
+//1ページの表示数
+const CONTENT_PER_PAGE = 5;
 //ログインしていない状態でのアクセス禁止
 if (!isset($_SESSION['47_LearnSNS']['id'])) {
     header('Location:signin.php');
@@ -38,10 +40,36 @@ if (!empty($_POST)) {
     }
 }
 
+if (isset($_GET['page'])) {
+    //ページの指定がある場合
+    $page=$_GET['page'];
+}else{
+    //ページの指定がない場合
+    $page=1;
+}
+
+//-1などの不正な値を渡された際の対処
+$page = max($page,1);
+//feedsテーブルのレコード数を取得する
+//COUNT()何レコードあるか集計するsqlの関数
+$sql = 'SELECT COUNT(*) AS `cnt` FROM `feeds`';
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$cnt = $result['cnt'];
+
+//最後のページ数を取得
+//最後のページ＝取得したページ数＋１ページあたりのページ数
+$last_page = ceil($cnt / CONTENT_PER_PAGE);
+
+echo "<pre>";
+var_dump($last_page);
+echo "</pre>";
+
 //1.投稿情報を全て取得
 $sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
 FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
-ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC';
+ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC LIMIT 5';
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 
@@ -128,8 +156,8 @@ while (true) {
             <?php endforeach; ?>
                 <div aria-label="Page navigation">
                     <ul class="pager">
-                        <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Newer</a></li>
-                        <li class="next disabled"><a>Older <span aria-hidden="true">&rarr;</span></a></li>
+                        <li class="previous"><a href="timeline.php?page=<?php echo $page -1; ?>"><span aria-hidden="true">&larr;</span> Newer</a></li>
+                        <li class="next"><a href="timeline.php?page=<?php echo $page + 1; ?>">Older <span aria-hidden="true">&rarr;</span></a></li>
                     </ul>
                 </div>
             </div>
