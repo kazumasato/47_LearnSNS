@@ -1,6 +1,8 @@
 <?php
 session_start();
 require('dbconnect.php');
+//1ページの表示数
+const CONTENT_PER_PAGE = 5;
 //ログインしていない状態でのアクセス禁止
 if (!isset($_SESSION['47_LearnSNS']['id'])) {
     header('Location:signin.php');
@@ -38,10 +40,49 @@ if (!empty($_POST)) {
     }
 }
 
+if (isset($_GET['page'])) {
+    //ページの指定がある場合
+    $page=$_GET['page'];
+}else{
+    //ページの指定がない場合
+    $page=1;
+}
+
+//-1などの不正な値を渡された際の対処
+$page = max($page,1);
+//feedsテーブルのレコード数を取得する
+//COUNT()何レコードあるか集計するsqlの関数
+$sql = 'SELECT COUNT(*) AS `cnt` FROM `feeds`';
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$cnt = $result['cnt'];
+
+//最後のページ数を取得
+//最後のページ＝取得したページ数＋１ページあたりのページ数
+$last_page = ceil($cnt / CONTENT_PER_PAGE);
+
+//最後のページより大きい値を入力された際の対策
+$page=min($page,$last_page);
+
+
+//スキップするレコード数=(指定ページ-1)*表示件数
+$start=($page-1) * CONTENT_PER_PAGE;
+//3ページめ(11~15)15=3*5 (3*5)-(5-1)
+//前のページまでに表示されたものは不要
+//(3-1)*5
+
+// echo "<pre>";
+// var_dump($last_page);
+// echo "</pre>";
+
 //1.投稿情報を全て取得
 $sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
 FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
-ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC';
+ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC LIMIT ' . CONTENT_PER_PAGE . ' OFFSET ' . $start;
+//LIMIT 数字 OFFSET 数字
+//OFFSETの前後にスペース (数字と繋がらないように)
+//LIMITの後ろにもスペース (数字と繋がらないように)
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 
@@ -128,8 +169,18 @@ while (true) {
             <?php endforeach; ?>
                 <div aria-label="Page navigation">
                     <ul class="pager">
-                        <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Newer</a></li>
-                        <li class="next disabled"><a>Older <span aria-hidden="true">&rarr;</span></a></li>
+
+                        <?php if ($page == 1): ?>
+                            <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Newer</a></li>
+                        <?php else: ?>
+                            <li class="previous"><a href="timeline.php?page=<?php echo $page -1; ?>"><span aria-hidden="true">&larr;</span> Newer</a></li>
+                        <?php endif; ?>
+
+                        <?php if ($page == $last_page): ?>
+                            <li class="next disabled"><a>Older <span aria-hidden="true">&rarr;</span></a></li>
+                        <?php else: ?>
+                            <li class="next"><a href="timeline.php?page=<?php echo $page + 1; ?>">Older <span aria-hidden="true">&rarr;</span></a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
