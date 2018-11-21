@@ -72,19 +72,30 @@ $start=($page-1) * CONTENT_PER_PAGE;
 //前のページまでに表示されたものは不要
 //(3-1)*5
 
+if (isset($_GET['search_word'])) {
+    //検索を行った時の処理
+    $sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
+    FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
+    ON `f`.`user_id` = `u`.`id` 
+    WHERE`f`.`feed`LIKE"%"?"%"
+    ORDER BY `f`.`created` DESC LIMIT ' . CONTENT_PER_PAGE . ' OFFSET ' . $start;
+
+    $data=[$_GET['search_word']];
+
+}else{
+    //その他の遷移
+    //1.投稿情報を全て取得
+    $sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
+    FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
+    ON `f`.`user_id` = `u`.`id` 
+    ORDER BY `f`.`created` DESC LIMIT ' . CONTENT_PER_PAGE . ' OFFSET ' . $start;
+    $data=[];
+}
+$stmt = $dbh->prepare($sql);
+$stmt->execute($data);
 // echo "<pre>";
 // var_dump($last_page);
 // echo "</pre>";
-
-//1.投稿情報を全て取得
-$sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
-FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
-ON `f`.`user_id` = `u`.`id` ORDER BY `f`.`created` DESC LIMIT ' . CONTENT_PER_PAGE . ' OFFSET ' . $start;
-//LIMIT 数字 OFFSET 数字
-//OFFSETの前後にスペース (数字と繋がらないように)
-//LIMITの後ろにもスペース (数字と繋がらないように)
-$stmt = $dbh->prepare($sql);
-$stmt->execute();
 
 //投稿情報全てを入れる配列定義
 $feeds = [];
