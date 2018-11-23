@@ -2,21 +2,19 @@
 session_start();
 require('dbconnect.php');
 
-
-$sql = 'SELECT `f`.*,`u`.`name`,`u`.`img_name`
-    FROM `feeds` AS `f` LEFT JOIN `users` AS `u`
-    ON `f`.`user_id` = `u`.`id` WHERE`f`.`id`=?';
-    $data=[$feed_id];
-    $stmt=$dbh->prepare($sql);
-    $stmt->execute($data);
-
-    $feed=$stmt->fetch(PDO::FETCH_ASSOC);
 $sql='SELECT * FROM `users` WHERE `id`=?';
 $data=[$_SESSION['47_LearnSNS']['id']];
 $stmt=$dbh->prepare($sql);
 $stmt->execute($data);
 
 $signin_user=$stmt->fetch(PDO::FETCH_ASSOC);
+
+$errors = [];
+
+$sql='INSERT INTO `feeds`(`feed`,`user_id`,`created`) VALUES(?,?,NOW());';
+        $data=[$feed,$signin_user['id']];
+        $stmt=$dbh->prepare($sql);
+        $stmt->execute($data);
 ?>
 <?php include('layouts/header.php'); ?>
 <body style="margin-top: 60px; background: #E4E6EB;">
@@ -31,9 +29,9 @@ $signin_user=$stmt->fetch(PDO::FETCH_ASSOC);
                             <img src="user_profile_img/<?php echo $signin_user['img_name']; ?>" width="80px">
                         </div>
                         <div class="col-xs-10">
-                            名前 <a href="profile.php" style="color: #7f7f7f;"><?php echo $feed['name']; ?></a>
+                            名前 <a href="profile.php" style="color: #7f7f7f;"><?php echo $signin_user['name']; ?></a>
                             <br>
-                            <?php echo $feed['created']; ?>
+                            <?php echo $feeds['created']; ?>
                         </div>
 
                     </div>
