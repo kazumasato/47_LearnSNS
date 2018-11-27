@@ -7,8 +7,8 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-3 text-center">
-                <img src="user_profile_img/misae.png" class="img-thumbnail" />
-                <h2>野原みさえ</h2>
+                <img src="user_profile_img/<?php echo$profile['img_name'];?>" class="img-thumbnail" />
+                <h2><?php echo $profile['name']; ?></h2>
                 <a href="follow.php">
                     <button class="btn btn-default btn-block">フォローする</button>
                 </a>
