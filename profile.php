@@ -1,4 +1,20 @@
 <?php
+session_start();
+require('dbconnect.php');
+$sql='SELECT * FROM `users` WHERE `id`=?';
+$data=[$_SESSION['47_LearnSNS']['id']];
+$stmt=$dbh->prepare($sql);
+$stmt->execute($data);
+
+$signin_user=$stmt->fetch(PDO::FETCH_ASSOC);
+
+
+$user_sql='SELECT * FROM `users` WHERE`id`=?';
+$user_data=[$signin_user['id']];
+$user_stmt=$dbh->prepare($user_sql);
+$user_stmt->execute($user_data);
+
+
 
 ?>
 <?php include('layouts/header.php'); ?>
@@ -7,8 +23,8 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-3 text-center">
-                <img src="user_profile_img/<?php echo$profile['img_name'];?>" class="img-thumbnail" />
-                <h2><?php echo $profile['name']; ?></h2>
+                <img src="user_profile_img/<?php echo$user['img_name']; ?>" class="img-thumbnail" />
+                <h2><?php echo $user['name']; ?></h2>
                 <a href="follow.php">
                     <button class="btn btn-default btn-block">フォローする</button>
                 </a>
@@ -31,7 +47,7 @@
                                     <img src="user_profile_img/misae.png" width="80px">
                                 </div>
                                 <div class="col-xs-10">
-                                    名前 <a href="profile.php" style="color: #7F7F7F;">佐藤一馬</a>
+                                    名前 <a href="profile.php" style="color: #7F7F7F;"></a>
                                     <br>
                                     2018-10-14 12:34:56からメンバー
                                 </div>

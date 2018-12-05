@@ -17,8 +17,16 @@ while (true) {
     if ($record==false) {
         break;
     }
-  $users[]=$record;
+  $feed_sql = 'SELECT COUNT(*) AS `cnt` FROM `feeds` WHERE `user_id` = ?';
+  $feed_data = [$record['id']];
+  $feed_stmt = $dbh->prepare($feed_sql);
+  $feed_stmt->execute($feed_data);
+  $feed = $feed_stmt->fetch(PDO::FETCH_ASSOC);
+  $record['feed_cnt'] = $feed['cnt'];
+
+  $users[] = $record;
 }
+
 // echo "<pre>";
 // var_dump($users);
 // echo "</pre>";
@@ -26,32 +34,32 @@ while (true) {
 <?php include('layouts/header.php'); ?>
 <body style="margin-top: 60px; background: #E4E6EB;">
     <?php include('navbar.php'); ?>
+<div class="container">
     <?php foreach ($users as $user):?>
-    <div class="container">
         <div class="row">
             <div class="col-xs-12">
                 <div class="thumbnail">
                     <div class="row">
-                        
                         <div class="col-xs-2">
-                            <img src="user_profile_img/<?php echo $user['img_name']; ?>" width="80px">
+                            <img src="user_profile_img/<?php echo$user['img_name'];?>" width="80px">
                         </div>
                         <div class="col-xs-1">
-                            名前 <a href="profile.php?user_id=<?php echo $user['id'];?>" style="color: #7f7f7f;"><?php echo $user['name']; ?></a>
-                            <br>
+                       名前 <a href="profile.php?user_id=<?php echo $user['id'];?>" style="color: #7f7f7f;">
+                            <?php echo $user['name']; ?>
+                            </a><br>
+                            <?php echo $user['created']; ?>からメンバー
                         </div>
-                    <?php echo $user['created']; ?>
                     </div>
                     <div class="row feed_sub">
                         <div class="col-xs-12">
-                            <span class="comment_count">つぶやき数：10</span>
+                            <span class="comment_count">つぶやき数： <?php echo $user['feed_cnt']; ?></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-<?php endforeach; ?>
+    <?php endforeach; ?>
+</div>
 </body>
 <?php include('layouts/footer.php'); ?>
 </html>

@@ -106,7 +106,7 @@ while (true) {
         //レコードが取れなくなったらループを抜ける
         break;
     }
-    //格闘交互とのコメント一覧を取得
+    //各投稿ごとのコメント一覧を取得
     $comment_sql='SELECT`c`.*,`u`.`name`,`u`.`img_name`FROM`comments` AS `c`
 LEFT JOIN`users` AS `u` ON`c`.`user_id`=`u`.`id`
 WHERE `c`.`feed_id`=?';
@@ -145,6 +145,7 @@ $record['comment_cnt']=$comment_cnt_result['comment_cnt'];
         共通部分を切り出して使いたいページから読み込む
     -->
     <?php include('navbar.php'); ?>
+    <span hidden class="signin-user"><?php echo $signin_user['id']; ?></span>
     <div class="container">
         <div class="row">
             <div class="col-xs-3">
@@ -183,7 +184,8 @@ $record['comment_cnt']=$comment_cnt_result['comment_cnt'];
                     </div>
                     <div class="row feed_sub">
                         <div class="col-xs-12">
-                            <button class="btn btn-default">いいね！</button>
+                            <span hidden class="feed-id"><?php echo $feed['id']; ?></span>
+                            <button class="btn btn-default js-like"><span>いいね！</span></button>
                             いいね数：
                             <span class="like-count">10</span>
                             <a href="#collapseComment<?php echo$feed['id']; ?>" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
