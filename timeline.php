@@ -1,4 +1,4 @@
-<?php
+'<?php
 session_start();
 require('dbconnect.php');
 //1ページの表示数
@@ -132,9 +132,28 @@ $comment_cnt_result=$comment_cnt_stmt->fetch(PDO::FETCH_ASSOC);
 //投稿の連想配列に新しくcomment＿cnt追加
 $record['comment_cnt']=$comment_cnt_result['comment_cnt'];
 
-    $feeds[] = $record;
-}
 
+     // いいね済みかどうか
+  $like_flg_sql = 'SELECT * FROM `likes` WHERE `user_id` = ? AND `feed_id` = ?';
+  //likesテーブルからuser_idがサインインしているユーザーのidかつfeed_idが投稿データのidのレコードデータを取得
+  $like_flg_data = [$signin_user['id'], $record['id']];
+  $like_flg_stmt = $dbh->prepare($like_flg_sql);
+  $like_flg_stmt->execute($like_flg_data);
+  $is_liked = $like_flg_stmt->fetch(PDO::FETCH_ASSOC);
+  $record['is_liked'] = $is_liked ? true : false;//三項演算子
+
+
+    // 何件いいねされているか確認
+  $like_sql = 'SELECT COUNT(*) AS `like_cnt` FROM `likes` WHERE `feed_id` = ?';
+  $like_data = [$record['id']];
+  $like_stmt = $dbh->prepare($like_sql);
+  $like_stmt->execute($like_data);
+  $like = $like_stmt->fetch(PDO::FETCH_ASSOC);
+  $record['like_cnt'] = $like['like_cnt'];
+
+  $feeds[] = $record;
+
+}
 
 ?>
 <?php include('layouts/header.php'); ?>
@@ -173,7 +192,8 @@ $record['comment_cnt']=$comment_cnt_result['comment_cnt'];
                             <img src="user_profile_img/<?php echo $feed['img_name']; ?>" width="100%px">
                         </div>
                         <div class="col-xs-11">
-                            <a href="profile.php" style="color: #7f7f7f;"><?php echo $feed['name']; ?></a>
+                            <a href="profile.php?user_id=<?php echo$feed['user_id'];?>" style="color: #7f7f7f;">
+                            <?php echo $feed['name']; ?></a>
                             <?php echo $feed['created']; ?>
                         </div>
                     </div>
@@ -185,9 +205,16 @@ $record['comment_cnt']=$comment_cnt_result['comment_cnt'];
                     <div class="row feed_sub">
                         <div class="col-xs-12">
                             <span hidden class="feed-id"><?php echo $feed['id']; ?></span>
-                            <button class="btn btn-default js-like"><span>いいね！</span></button>
-                            いいね数：
-                            <span class="like-count">10</span>
+
+                            <?php if($feed['is_liked']): ?>
+                                <button class="btn btn-info js-unlike"><span>いいねを取り消す</span></button>
+                                いいね数：
+                            <?php else: ?>
+                                <button class="btn btn-default js-like"><span>いいね！</span></button>
+                                いいね数：
+                            <?php endif; ?>
+
+                            <span class="like-count"><?php echo $feed['like_cnt']; ?></span>
                             <a href="#collapseComment<?php echo$feed['id']; ?>" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
                             <!-- トグルオープンするのはbootstrapの機能 -->
                             <span class="comment-count">コメント数:<?php echo$feed['comment_cnt']; ?></span>
